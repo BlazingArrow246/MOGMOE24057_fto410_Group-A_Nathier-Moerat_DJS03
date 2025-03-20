@@ -1,8 +1,11 @@
+//__________________________________________Import Data___________________________________________
 import { books, authors, genres, BOOKS_PER_PAGE } from './data.js'
 
+//____________________Initial starting page and book matches(initially set to all books)__________
 let page = 1;
 let matches = books
 
+//________________________________Displaying initial book previews________________________________
 const starting = document.createDocumentFragment()
 
 for (const { author, id, image, title } of matches.slice(0, BOOKS_PER_PAGE)) {
@@ -12,7 +15,7 @@ for (const { author, id, image, title } of matches.slice(0, BOOKS_PER_PAGE)) {
 
     element.innerHTML = `
         <img
-            class="preview__image"
+            class="preview__image"                      
             src="${image}"
         />
         
@@ -24,9 +27,14 @@ for (const { author, id, image, title } of matches.slice(0, BOOKS_PER_PAGE)) {
 
     starting.appendChild(element)
 }
-
 document.querySelector('[data-list-items]').appendChild(starting)
 
+
+//Creates book preview buttons for the first BOOKS_PER_PAGE books.
+//Each button includes book details (image, title, author).
+//Appends these buttons to the page.
+
+//_____________________________________Populating genre filter_____________________________________________
 const genreHtml = document.createDocumentFragment()
 const firstGenreElement = document.createElement('option')
 firstGenreElement.value = 'any'
@@ -42,6 +50,10 @@ for (const [id, name] of Object.entries(genres)) {
 
 document.querySelector('[data-search-genres]').appendChild(genreHtml)
 
+//Populates the genre dropdown with all available genres.
+//Adds an "All Genres" option for no genre filtering.
+
+//______________________________________Populating author filter___________________________________________
 const authorsHtml = document.createDocumentFragment()
 const firstAuthorElement = document.createElement('option')
 firstAuthorElement.value = 'any'
@@ -57,6 +69,10 @@ for (const [id, name] of Object.entries(authors)) {
 
 document.querySelector('[data-search-authors]').appendChild(authorsHtml)
 
+//Similar to genres, this populates the author dropdown with all authors.
+//Includes an "All Authors" option.
+
+//________________________________________Light and Dark mode_____________________________________________
 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     document.querySelector('[data-settings-theme]').value = 'night'
     document.documentElement.style.setProperty('--color-dark', '255, 255, 255');
@@ -67,22 +83,32 @@ if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').match
     document.documentElement.style.setProperty('--color-light', '255, 255, 255');
 }
 
+//Detects user’s system preference (light/dark mode) and applies corresponding theme.
+//Updates CSS variables for theme colors.
+
+//______________________________________"Show More" Button Setup__________________________________________
 document.querySelector('[data-list-button]').innerText = `Show more (${books.length - BOOKS_PER_PAGE})`
 document.querySelector('[data-list-button]').disabled = (matches.length - (page * BOOKS_PER_PAGE)) > 0
+
+//Updates the "Show more" button with the number of remaining books.
+//Disables the button if there are no more books to load.
 
 document.querySelector('[data-list-button]').innerHTML = `
     <span>Show more</span>
     <span class="list__remaining"> (${(matches.length - (page * BOOKS_PER_PAGE)) > 0 ? (matches.length - (page * BOOKS_PER_PAGE)) : 0})</span>
 `
+//_________________________________________Event listeners________________________________________________
 
+//__________________________Closing overlays____________________________________
 document.querySelector('[data-search-cancel]').addEventListener('click', () => {
     document.querySelector('[data-search-overlay]').open = false
 })
 
+//________________________Close settings overlay___________________________________
 document.querySelector('[data-settings-cancel]').addEventListener('click', () => {
     document.querySelector('[data-settings-overlay]').open = false
 })
-
+//__________________________Opening overlay______________________________________
 document.querySelector('[data-header-search]').addEventListener('click', () => {
     document.querySelector('[data-search-overlay]').open = true 
     document.querySelector('[data-search-title]').focus()
@@ -96,6 +122,7 @@ document.querySelector('[data-list-close]').addEventListener('click', () => {
     document.querySelector('[data-list-active]').open = false
 })
 
+//__________________________Theme change handling__________________________________
 document.querySelector('[data-settings-form]').addEventListener('submit', (event) => {
     event.preventDefault()
     const formData = new FormData(event.target)
@@ -112,6 +139,7 @@ document.querySelector('[data-settings-form]').addEventListener('submit', (event
     document.querySelector('[data-settings-overlay]').open = false
 })
 
+//___________________________Book search handling__________________________________
 document.querySelector('[data-search-form]').addEventListener('submit', (event) => {
     event.preventDefault()
     const formData = new FormData(event.target)
@@ -144,6 +172,7 @@ document.querySelector('[data-search-form]').addEventListener('submit', (event) 
         document.querySelector('[data-list-message]').classList.remove('list__message_show')
     }
 
+    //___________________________Book preview click handling_________________________________________
     document.querySelector('[data-list-items]').innerHTML = ''
     const newItems = document.createDocumentFragment()
 
